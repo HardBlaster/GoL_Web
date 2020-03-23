@@ -47,48 +47,39 @@ public class Environment {
         }
     }
 
-    public void nextGen() {
+    public int[][] nextGen() {
         int[][] neighbors = getNeighbours();
-        int r = 0;
 
-        for (Cell[] row : this.matrix) {
+        for(int i = 0; i < matrix.length; i++) {
+            for(int j = 0; j < matrix[0].length; j++) {
+                if(matrix[i][j].isValid()) {
 
-            int c = 0;
-            for (Cell cell : row) {
-                if (cell.isValid()) {
-
-                    if (ArrayUtils.contains(this.ruleSystem.getBorn(), neighbors[r][c])) {
-                        cell.live();
-                    } else if (ArrayUtils.contains(this.ruleSystem.getDead(), neighbors[r][c])) {
-                        cell.kill();
+                    if (ArrayUtils.contains(this.ruleSystem.getBorn(), neighbors[i][j])) {
+                        matrix[i][j].live();
+                    } else if (ArrayUtils.contains(this.ruleSystem.getDead(), neighbors[i][j])) {
+                        matrix[i][j].kill();
                     }
 
-                    c++;
                 }
             }
-
-            r++;
         }
+
+        return neighbors;
     }
 
     private int[][] getNeighbours() {
-        int[][] neighbors = new int[this.height][this.width];
-        int r = 0;
+        int[][] neighbors = new int[this.height][this.width*2];
 
-        for (Cell[] row : matrix) {
+        for(int i = 0; i < matrix.length; i++) {
+            for(int j = 0; j < matrix[0].length; j++) {
 
-            int c = 0;
-            int nc = 0;
-            for (Cell cell : row) {
-
-                if (cell.isValid()) {
-                    neighbors[r][nc] = livingNeighbors(r, c);
-                    nc++;
+                if(matrix[i][j].isValid()) {
+                    neighbors[i][j] = livingNeighbors(i, j);
+                } else {
+                    neighbors[i][j] = Cell.INVALID;
                 }
-                c++;
-            }
-            r++;
 
+            }
         }
 
         return neighbors;
@@ -101,8 +92,8 @@ public class Environment {
             for (int j = -3; j <= 3; j++) {
 
                 if (row + i >= 0 && row + i < this.height
-                        && col + j >= 0 && col + j < this.width
-                        && i != 0 && j != 0
+                        && col + j >= 0 && col + j < this.width*2
+                        && !(i == 0 && j == 0)
                         && this.matrix[row + i][col + j].isAlive()) {
                     neighbors++;
                 }
